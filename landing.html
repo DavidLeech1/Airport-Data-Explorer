@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Airport Data Explorer</title>
+
+    <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-firestore.js"></script>
+
+    <link rel="stylesheet" href="css/landing-style.css"/>
+</head>
+<body>
+    <!-- The video -->
+    <video autoplay muted loop id="myVideo">
+        <source src="data/Landing.MP4" type="video/mp4">
+    </video>
+
+    <h1>Airport Data Explorer Tool</h1>
+    <p>Welcome to the Airport Data Explorer, an interactive web-map tool</p>
+    <p>for discovering, filtering, and comparing airports. Click below to get started.</p>
+
+
+
+    <div class="buttoncontainer">
+        <button onclick="document.getElementById('id01').style.display='block'" style="width:auto;">Login</button>
+    </div>
+
+
+    <img src="img/screenshot.jpg" class="screenshot" id="screenshot">
+
+    <!-- The Screenshot Modal -->
+    <div id="screenshotModal" class="modal-screenshot">
+        <span class="close">&times;</span>
+        <img class="modal-content-screenshot" id="screenshot1">
+        <div id="caption"></div>
+    </div>
+
+
+    <div id="id01" class="modal">
+
+        <form id="login-form" class="modal-content animate" action="/action_page.php" method="post">
+            <div class="imgcontainer">
+                <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+                <img src="img/airport_avatar.jpg" alt="Avatar" class="avatar">
+            </div>
+
+            <div class="container">
+                <label for="uname"><b>Username</b></label>
+                <input type="text" id="login-email" placeholder="Enter Username" name="uname" required>
+
+                <label for="psw"><b>Password</b></label>
+                <input type="password" id="login-password" placeholder="Enter Password" name="psw" required>
+
+                <button type="submit">Login</button>
+                <label>
+                    <input type="checkbox" checked="checked" name="remember"> Remember me
+                </label>
+            </div>
+
+            <div class="container" style="background-color:#f1f1f1">
+                <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
+                <span class="psw"><a href="#"> Forgot password?</a></span>
+            </div>
+        </form>
+    </div>
+
+
+    <!--
+    <div class="buttoncontainer">
+        <button onclick="window.location.href = 'index.html';" style="width:auto;">Continue without Login</button>
+    </div>
+    -->
+
+    <script src="js/loginmodal.js"></script>
+    <script src="js/authorization.js"></script>
+
+
+</body>
+</html>

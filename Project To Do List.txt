@@ -1,0 +1,29 @@
+Project To Do list
+
+-Add a legend for different airport symbols based on NPIAS
+-Add input value boxes for the slider bars
+-Add data to the databased for operations
+
+
+
+Numerical Data
+-Airport Elevation
+-Based Jets
+-Longest Runway Length
+_Longest Runway Width
+-Total Instrument Operations (2019)
+
+
+
+Category Data
+-NPIAS Category
+-Assett Role
+-State
+
+
+
+Features
+-ILS
+-Control Tower
+
+(Toggle Switch)?

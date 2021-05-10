@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width">
+		<title>Airport Data Explorer</title>
+
+        <!-- Load CARTO VL JS -->
+        <script src="https://libs.cartocdn.com/carto-vl/v1.2.4/carto-vl.min.js"></script>
+        <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+        <!-- Include CARTO.js -->
+        <script src="https://cartodb-libs.global.ssl.fastly.net/carto.js/v4.2.0/carto.min.js"></script>
+
+        <!--<link rel="stylesheet" href="css/leaflet.css">
+        <script src="js/leaflet.js"></script>
+        <link rel="stylesheet" href="css/leaflet.draw.css">
+
+        <script src="js/leaflet.draw.js"></script>-->
+
+        <link href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" rel="stylesheet" />
+        <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+
+        <!-- load the d3.js library -->
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+
+
+
+        <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+        <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/11.1.0/nouislider.min.css" rel="stylesheet">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+       <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.16/js/bootstrap-multiselect.min.js" integrity="sha512-ljeReA8Eplz6P7m1hwWa+XdPmhawNmo9I0/qyZANCCFvZ845anQE+35TuZl9+velym0TKanM2DXVLxSJLLpQWw==" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.16/css/bootstrap-multiselect.css" integrity="sha512-DJ1SGx61zfspL2OycyUiXuLtxNqA3GxsXNinUX3AnvnwxbZ+YQxBARtX8G/zHvWRG9aFZz+C7HxcWMB0+heo3w==" crossorigin="anonymous" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.16/css/bootstrap-multiselect.min.css" integrity="sha512-wHTuOcR1pyFeyXVkwg3fhfK46QulKXkLq1kxcEEpjnAPv63B/R49bBqkJHLvoGFq6lvAEKlln2rE1JfIPeQ+iw==" crossorigin="anonymous" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.16/js/bootstrap-multiselect.js" integrity="sha512-5EvDL79fM8WJcOk77QpsZ8DawGlSfbOZ/ycRPz0bxRgtiOFEMj8taAoqmm7AR4p2N+A6VBLg/Ar30L8qbPw1pQ==" crossorigin="anonymous"></script>
+
+
+        <!-- Stylesheet for toggle button -->
+        <link href="https://cdn.jsdelivr.net/css-toggle-switch/latest/toggle-switch.css" rel="stylesheet" />
+
+
+        <link rel="stylesheet" href="css/style.css"/>
+
+    </head>
+
+    <body>
+
+
+        <!-- We create a div where the feature data will go when clicked on: -->
+        <!--<div class="sidebar-feature-content"></div>-->
+
+
+
+        <div class="dummy-menu">
+            <a class="align-button">Switch Tab Alignment</a>
+        </div>
+        <div class="dropins-container right">
+            <div class="tabs">
+                <div class="tab" data-content="content1">
+
+                    <div class="tab-name"><span>Numerical</span></div>
+                </div>
+                <div class="tab" data-content="content2">
+
+                    <div class="tab-name"><span>Category</span></div>
+                </div>
+                <div class="tab" data-content="content3">
+
+                    <div class="tab-name"><span>Features</span></div>
+                </div>
+                <div class="tab" data-content="content4">
+
+                    <div class="tab-name"><span>Style</span></div>
+                </div>
+                <div class="tab" data-content="content5">
+
+                    <div class="tab-name"><span>Compare</span></div>
+                </div>
+                <div class="tab" data-content="content6">
+
+                    <div class="tab-name"><span style="font-size:14px;">About</span></div>
+                </div>
+            </div>
+            <div class="contents">
+                <div class="content" id="content1" style="overflow-y:scroll;">
+                    <h2>Numerical Filters</h2>
+                    <p>Elevation</p>
+                    <div id="elevation-slider"></div>
+                    <p>Based Jets</p>
+                    <div id="basedjets-slider"></div>
+                    <p>Longest Runway Length</p>
+                    <div id="rwlength-slider"></div>
+                    <p>Longest Runway Width</p>
+                    <div id="rwwidth-slider"></div>
+                    <p>Passenger Enplanements (CY 2019)</p>
+                    <div id="enplanements-slider"></div>
+                    <p>Aircraft Operations (from 5010)</p>
+                    <div id="ops-slider"></div>
+
+
+                </div>
+                <div class="content" id="content2">
+                    <h2>Airport Type Filters</h2>
+                    <p>Airport Ownership (Public or Private)</p>
+                    <div class="switch-toggle switch-3 switch-candy">
+                        <input id="OwnerPU" name="Owner" type="radio" value='PU' checked="" />
+                        <label for="OwnerPU" onclick="OwnerPU();">PU</label>
+
+                        <input id="Ownerna" name="Owner" type="radio" value='na' checked="checked" />
+                        <label for="Ownerna" onclick="Ownerna();">N/A</label>
+
+                        <input id="OwnerPR" name="Owner" type="radio" value='PR' />
+                        <label for="OwnerPR" onclick="OwnerPR();">PR</label>
+                        <a></a>
+                    </div>
+
+
+                    <div class="form-group">
+                        <!--<label class="col-md-4 control-label" for="rolename">State / Territory</label>-->
+                        <p>State / Territory</p>
+                        <div class="dropdown">  <!--'col-md-4'-->
+                            <select id="state-drop" class="multiselect-ui form-control" multiple="multiple">
+                                <option value="AL">Alabama</option>
+                                <option value="AK">Alaska</option>
+                                <option value="AS">American Samoa</option>
+                                <option value="AZ">Arizona</option>
+                                <option value="AR">Arkansas</option>
+                                <option value="CA">California</option>
+                                <option value="CO">Colorado</option>
+                                <option value="CT">Connecticut</option>
+                                <option value="DE">Delaware</option>
+                                <option value="DC">District of Columbia</option>
+                                <option value="FL">Florida</option>
+                                <option value="GA">Georgia</option>
+                                <option value="GU">Guam</option>
+                                <option value="HI">Hawaii</option>
+                                <option value="ID">Idaho</option>
+                                <option value="IL">Illinois</option>
+                                <option value="IN">Indiana</option>
+                                <option value="IA">Iowa</option>
+                                <option value="KS">Kansas</option>
+                                <option value="KY">Kentucky</option>
+                                <option value="LA">Louisiana</option>
+                                <option value="ME">Maine</option>
+                                <option value="MD">Maryland</option>
+                                <option value="MA">Massachusetts</option>
+                                <option value="MI">Michigan</option>
+                                <option value="QM">Midway Islands</option>
+                                <option value="MN">Minnesota</option>
+                                <option value="MS">Mississippi</option>
+                                <option value="MO">Missouri</option>
+                                <option value="MT">Montana</option>
+                                <option value="NE">Nebraska</option>
+                                <option value="NV">Nevada</option>
+                                <option value="NH">New Hampshire</option>
+                                <option value="NJ">New Jersey</option>
+                                <option value="NM">New Mexico</option>
+                                <option value="NY">New York</option>
+                                <option value="NC">North Carolina</option>
+                                <option value="ND">North Dakota</option>
+                                <option value="MP">Northern Marianas</option>
+                                <option value="OH">Ohio</option>
+                                <option value="OK">Oklahoma</option>
+                                <option value="OR">Oregon</option>
+                                <option value="XL">Palmyra Island</option>
+                                <option value="PA">Pennsylvania</option>
+                                <option value="PR">Puerto Rico</option>
+                                <option value="RI">Rhode Island</option>
+                                <option value="SC">South Carolina</option>
+                                <option value="SD">South Dakota</option>
+                                <option value="TN">Tennessee</option>
+                                <option value="TX">Texas</option>
+                                <option value="UT">Utah</option>
+                                <option value="VT">Vermont</option>
+                                <option value="VA">Virginia</option>
+                                <option value="VI">Virgin Islands</option>
+                                <option value="QW">Wake Island</option>
+                                <option value="WA">Washington</option>
+                                <option value="WV">West Virginia</option>
+                                <option value="WI">Wisconsin</option>
+                                <option value="WY">Wyoming</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <script type="text/javascript">
+                        $(function() {
+                            $('.multiselect-ui').multiselect({
+                                includeSelectAllOption: true
+                            });
+                            //var states = $('select#state-drop').val()
+                            //$('#state-drop').onchange(statechange());
+                            $('#state-drop').change(function(){
+                                //alert($(this).val());
+                                statechange();
+                            });
+                        });
+                    </script>
+
+
+
+
+                    <div class="form-group">
+                        <!--<label class="col-md-4 control-label" for="rolename">NPIAS Role Designation</label>-->
+                        <p>NPIAS Role Designation</p>
+                        <div class="dropdown">  <!--'col-md-4'-->
+                            <select id="npias-drop" class="multiselect-ui form-control" multiple="multiple">
+                                <option value="Primary Large">Primary Large</option>
+                                <option value="Primary Medium">Primary Medium</option>
+                                <option value="Primary Small">Primary Small</option>
+                                <option value="Primary Non-Hub">Primary Non-Hub</option>
+                                <option value="Commercial Service">Commercial Service</option>
+                                <option value="Reliever">Reliever</option>
+                                <option value="General Aviation">General Aviation</option>
+                                <option value="NON-NPIAS">Non-NPIAS</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <script type="text/javascript">
+                        $(function() {
+                            $('.multiselect-ui').multiselect({
+                                includeSelectAllOption: true
+                            });
+                            //var states = $('select#state-drop').val()
+                            //$('#state-drop').onchange(statechange());
+                            $('#npias-drop').change(function(){
+                                //alert($(this).val());
+                                npiaschange();
+                            });
+                        });
+                    </script>
+
+
+
+                </div>
+                <div class="content" id="content3">
+                    <h2>Airport Features</h2>
+                    <p>Air Traffic Control Tower</p>
+                    <div class="switch-toggle switch-3 switch-candy">
+                        <input id="ATCTon" name="ATCT" type="radio" value='Y'/>
+                        <label for="ATCTon" onclick="ATCTon();">YES</label>
+
+                        <input id="ATCTna" name="ATCT" type="radio" value='na' checked="checked" />
+                        <label for="ATCTna" onclick="ATCTna();">N/A</label>
+
+                        <input id="ATCToff" name="ATCT" type="radio" value='N' />
+                        <label for="ATCToff" onclick="ATCToff();">NO</label>
+                        <a></a>
+                    </div>
+                    <p>Full Instrument Landing System (ILS)</p>
+                    <div class="switch-toggle switch-3 switch-candy">
+                        <input id="ILSon" name="ILS" type="radio" value='Yes' checked="" />
+                        <label for="ILSon" onclick="ILSon();">YES</label>
+
+                        <input id="ILSna" name="ILS" type="radio" value='na' checked="checked" />
+                        <label for="ILSna" onclick="ILSna();">N/A</label>
+
+                        <input id="ILSoff" name="ILS" type="radio" value='No' />
+                        <label for="ILSoff" onclick="ILSoff();">NO</label>
+                        <a></a>
+                    </div>
+                    <p>Approach Lighting System (ALS)</p>
+                    <div class="switch-toggle switch-3 switch-candy">
+                        <input id="ALSon" name="ALS" type="radio" value='Y' checked="" />
+                        <label for="ALSon" onclick="ALSon();">YES</label>
+
+                        <input id="ALSna" name="ALS" type="radio" value='na' checked="checked" />
+                        <label for="ALSna" onclick="ALSna();">N/A</label>
+
+                        <input id="ALSoff" name="ALS" type="radio" value='N' />
+                        <label for="ALSoff" onclick="ALSoff();">NO</label>
+                        <a></a>
+                    </div>
+                    <p>Part 139 Certified</p>
+                    <div class="switch-toggle switch-3 switch-candy">
+                        <input id="Part139on" name="Part139" type="radio" value='Y' checked="" />
+                        <label for="Part139on" onclick="Part139on();">YES</label>
+
+                        <input id="Part139na" name="Part139" type="radio" value='na' checked="checked" />
+                        <label for="Part139na" onclick="Part139na();">N/A</label>
+
+                        <input id="Part139off" name="Part139" type="radio" value='N' />
+                        <label for="Part139off" onclick="Part139off();">NO</label>
+                        <a></a>
+                    </div>
+
+
+
+
+
+
+
+                </div>
+
+
+
+
+
+
+
+
+                <div class="content" id="content4">
+                    <h2>Airport Style</h2>
+                    <p>Symbolize By:</p>
+                    <div class="switch-toggle switch-3 switch-candy" style="width: 20em">
+                        <input id="StyleNpias" name="style" type="radio" value='npias' checked="checked" />
+                        <label for="StyleNpias" onClick="styleNPIAS()">NPIAS</label>
+
+                        <input id="StyleRegion" name="style" type="radio" value='region'/>
+                        <label for="StyleRegion" onclick="styleRegion();">Region</label>
+
+                        <input id="StyleElevation" name="style" type="radio" value='elevation'/>
+                        <label for="StyleElevation" onClick="styleElevation();">Elevation</label>
+
+                        <a></a>
+
+                    </div>
+                </div>
+
+
+
+
+                <div class="content" id="content5">
+                    <h2>Compare Airports</h2>
+                    <p>Click on an airport point to add it to the comparison.</p>
+
+                    <div id="clearbutton">
+                        <button type="button" onclick="clearbars()" style="color: black; border-radius: 6px; font-family: Roboto, sans-serif;">Clear Selection</button>
+
+                    </div>
+                    <div class="switch-toggle switch-3 switch-candy" style="width: 25em">
+                        <input id="RWcomp" name="Comp" type="radio" value='RW' checked="checked" />
+                        <label for="RWcomp" onclick="updateRWlength();">RW Length</label>
+
+                        <input id="ElevationComp" name="Comp" type="radio" value='Elev'/>
+                        <label for="ElevationComp" onclick="updateElevation();">Elevation</label>
+
+                        <input id="BasedJetsComp" name="Comp" type="radio" value='BJ'/>
+                        <label for="BasedJetsComp" onclick="updateBasedJets();">Based Jets</label>
+
+
+
+                        <a></a>
+
+                    </div>
+                    <!-- barchart -->
+                    <div id="my_dataviz"></div>
+
+                        <!--<script type="text/javascript" src="js/barchart.js"></script>-->
+
+                </div>
+
+
+
+
+                    <div class="content" id="content6">
+                        <h3>About</h3>
+                        <br>
+                        <p>
+                            <b>The Airport Finder Tool </b>
+                            is an interactive web application design to help users identify a selection of airports based upon
+                            specific criteria.  The input parameters of this criteria can be adjusted using various sliders,
+                            dropdowns, and toggle buttons found on the above tabs.
+                            <br>
+                            <br>
+                            Data for this tool comes from the
+                            <a href="https://www.faa.gov/airports/airport_safety/airportdata_5010/" style="color:#35C1E3;">Federal Aviation Administration</a>.
+                            <br>
+                            Designed and developed by
+                            <a href="https://www.linkedin.com/in/david-j-leech-p-e-323735137" style="color:#35C1E3;">David Leech</a>,
+                            graduate student with the University of Wisconsin-Madison.
+                        </p>
+
+                    </div>
+
+
+
+            </div>
+        </div>
+
+
+
+        <div id="map-canvas" class="col-xs-9"></div>
+
+        <!-- legend -->
+        <div id="legend">
+            <h1>Dynamic Legends</h1>
+            <div id="legend-content">
+            </div>
+        </div>
+
+
+        <!--<script src="js/loadform.js"></script>-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/11.1.0/nouislider.min.js"></script>
+        <script src="https://unpkg.com/wnumb@1.2.0/wNumb.js"></script>
+        <script src="js/main.js"></script>
+        <script src="js/airports.js"></script>
+        <!--<script src="js/authorization.js"></script>-->
+        <script src="js/index.js"></script>
+        <script src="js/tabs.js"></script>
+        <script src="js/d3barchart.js"></script>
+
+
+
+
+
+
+
+
+	</body>
+</html>
