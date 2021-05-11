@@ -120,6 +120,20 @@
                     </div>
 
 
+                    <p>Client</p>
+                    <div class="switch-toggle switch-3 switch-candy">
+                        <input id="ClientY" name="Client" type="radio" value='true' checked="" />
+                        <label for="ClientY" onclick="ClientY();">Yes</label>
+
+                        <input id="Clientna" name="Client" type="radio" value='na' checked="checked" />
+                        <label for="Clientna" onclick="Clientna();">N/A</label>
+
+                        <input id="ClientN" name="Client" type="radio" value='false' />
+                        <label for="ClientN" onclick="ClientN();">No</label>
+                        <a></a>
+                    </div>
+
+
                     <div class="form-group">
                         <!--<label class="col-md-4 control-label" for="rolename">State / Territory</label>-->
                         <p>State / Territory</p>
@@ -319,6 +333,9 @@
 
                         <input id="StyleElevation" name="style" type="radio" value='elevation'/>
                         <label for="StyleElevation" onClick="styleElevation();">Elevation</label>
+
+                        <input id="StyleDelta" name="style" type="radio" value='client'/>
+                        <label for="StyleDelta" onClick="styleDelta();">Client</label>
 
                         <a></a>
 

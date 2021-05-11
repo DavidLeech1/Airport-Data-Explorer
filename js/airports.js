@@ -24,7 +24,7 @@ const style_airports = new carto.style.CartoCSS(`
 
 
 const layer_airports = new carto.layer.Layer(source_airports, style_airports, {
-    featureClickColumns: ['id','facilityname','npias','elevation','runwaylength','basedjets']
+    featureClickColumns: ['id','facilityname','npias','elevation','runwaylength','basedjets','deltaclient']
 });
 
 
@@ -160,6 +160,34 @@ function styleRegion() {
 
 
 
+function styleDelta() {
+    style_airports.setContent(
+        '#airports-layer {\n' +
+        '            marker-width: 12;\n' +
+        '            marker-fill: ramp([deltaclient], (#a29faa, #ff0000), (false, true), "=");\n' +
+        '            marker-fill-opacity: 1;\n' +
+        '            marker-file: url(\'https://s3.amazonaws.com/com.cartodb.users-assets.production/maki-icons/airport-18.svg\');\n' +
+        '            marker-allow-overlap: true;\n' +
+        '            marker-line-width: 1;\n' +
+        '            marker-line-color: #FFFFFF;\n' +
+        '            marker-line-opacity: 1;\n' +
+        '          }'
+    );
+    legend.empty();
+    const categories = ["Delta Client", "Not Delta Client"];
+    const colors = ["#ff0000", "#a29faa"];
+
+    var select = '';
+    select += '<h3 href="#" ' + 'id='+'"all"><span style="background-color: white"></span><b style="font-size: 15px; color: #2D3C43"><u>Client</u></b></h3>';
+    for (var i=0;i<categories.length;i++){
+        var color = colors[i];
+        var cat = categories[i];
+        //select += '<a href="#" id="'+cat.valueOf()+'"><span style="background-color:'+color+'"><b>'+cat.toString()+'</b></span></a>' + "<br>";
+        select += '<li href="#" style="height: 20px;" id="'+cat.valueOf()+'"><span class="square" style="background-color:'+color+'; height: 4px"></span><b class="legend-content" style="color: #6c757d; font-size: 12px;">'+cat.toString()+'</b></li>';
+    }
+    $('#legend').html(select)
+}
+
 
 
 
@@ -234,7 +262,7 @@ function statechange(){
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
     //console.log(sql_state);
@@ -269,7 +297,7 @@ function npiaschange(){
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 }
@@ -289,6 +317,7 @@ layer_airports.on(carto.layer.events.FEATURE_OVER, featureEvent => {
         popup.setContent("<b>" + 'Airport ID: ' + "</b>" + featureEvent.data.id + "<br>" +
                             "<b>" + 'Facility Name: ' + "</b>" + featureEvent.data.facilityname + "<br>" +
                             "<b>" + 'NPIAS Category: ' + "</b>" + featureEvent.data.npias + "<br>" +
+                            "<b>" + 'Delta Client: ' + "</b>" + featureEvent.data.deltaclient + "<br>" +
                             "<b>" + 'Elevation: ' + "</b>" + featureEvent.data.elevation + "' MSL" + "<br>" +
                             "<b>" + 'Runway Length: ' + "</b>" + featureEvent.data.runwaylength + " ft" + "<br>" +
                             "<b>" + 'Based Jets: ' + "</b>" + featureEvent.data.basedjets);
@@ -337,7 +366,7 @@ basedjets_tooltipSlider.noUiSlider.on('change', function () {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 });
@@ -376,7 +405,7 @@ elev_tooltipSlider.noUiSlider.on('change', function () {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 });
@@ -413,7 +442,7 @@ rwlength_tooltipSlider.noUiSlider.on('change', function () {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 });
@@ -449,7 +478,7 @@ rwwidth_tooltipSlider.noUiSlider.on('change', function () {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 });
@@ -486,7 +515,7 @@ enplanements_tooltipSlider.noUiSlider.on('change', function () {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 });
@@ -522,7 +551,7 @@ ops_tooltipSlider.noUiSlider.on('change', function () {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 });
@@ -544,7 +573,7 @@ function OwnerPU() {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 }
@@ -555,7 +584,7 @@ function OwnerPR() {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 }
@@ -566,10 +595,55 @@ function Ownerna() {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 }
+
+
+
+
+
+
+
+
+
+//Delta Client Radio button value update
+let sql_deltaclient = "";
+function ClientY() {
+    sql_deltaclient = " AND deltaclient = '1'";
+
+    source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
+        ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
+        ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
+        sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
+    );
+}
+function ClientN() {
+    sql_deltaclient = " AND deltaclient = '0'";
+
+    source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
+        ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
+        ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
+        sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
+    );
+}
+function Clientna() {
+    sql_deltaclient = '';
+
+    source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
+        ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
+        ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
+        sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
+    );
+}
+
 
 
 
@@ -585,7 +659,7 @@ function ATCTon() {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 }
@@ -596,7 +670,7 @@ function ATCToff() {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 }
@@ -607,7 +681,7 @@ function ATCTna() {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 }
@@ -625,7 +699,7 @@ function ILSon() {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 }
@@ -636,7 +710,7 @@ function ILSoff() {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 }
@@ -647,7 +721,7 @@ function ILSna() {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 }
@@ -667,7 +741,7 @@ function ALSon() {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 }
@@ -678,7 +752,7 @@ function ALSoff() {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 }
@@ -689,7 +763,7 @@ function ALSna() {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 }
@@ -708,7 +782,7 @@ function Part139on() {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 }
@@ -719,7 +793,7 @@ function Part139off() {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 }
@@ -730,7 +804,7 @@ function Part139na() {
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
-        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
         sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
     );
 }
