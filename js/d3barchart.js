@@ -2,7 +2,7 @@
 // JS that controls the bar chart comparison.
 
 
-comp = [{id: "Empty", rwlength: 0, basedjets: 0, elevation: 0}];
+comp = [{id: "Empty", rwlength: 0, basedjets: 0, elevation: 0, basedaircraft: 0}];
 var comp_count = 0;
 var comp_type = "RWlength";
 
@@ -290,6 +290,87 @@ function updateBasedJets() {
 }
 
 
+
+
+
+function updateBasedAircraft() {
+
+    comp_type = "BasedAircraft";
+
+
+    d3.select("svg").remove();
+
+    // append the svg object to the body of the page
+    var svg = d3.select("#my_dataviz")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")");
+
+
+    const max = comp.reduce((max, b) => Math.max(max, b.basedaircraft), comp[0].basedaircraft);
+    console.log(max);
+
+    // X axis
+    var x = d3.scaleBand()
+        .range([ 0, width ])
+        .domain(comp.map(function(d) { return d.id; }))
+        .padding(0.2);
+    svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .attr("class", "myXaxis")
+        .call(d3.axisBottom(x));
+
+    // Add Y axis
+    var y = d3.scaleLinear()
+        .domain([0, max])
+        .range([ height, 0]);
+    svg.append("g")
+        .attr("class", "myYaxis")
+        .call(d3.axisLeft(y));
+
+    var u = svg.selectAll(".bar")
+        .data(comp);
+
+    u
+        .enter()
+        .append("rect")
+        .attr("class", "bar")
+        .merge(u)
+        .transition()
+        .duration(1000)
+        .attr("x", function(d) { return x(d.id); })
+        .attr("y", function(d) { return y(d.basedaircraft); })
+        .attr("width", x.bandwidth())
+        .attr("height", function(d) { return height - y(d.basedaircraft); })
+        .attr("fill", "#69b3a2")
+
+    svg.selectAll("text.bar")
+        .data(comp)
+        .enter().append("text")
+        .transition()
+        .duration(1000)
+        .attr("class", "bartext")
+        .attr("text-anchor", "middle")
+        .attr("x", function (d) {
+            return x(d.id) + ((x.bandwidth())/2);
+        })
+        .attr("y", function (d) {
+            return y(d.basedaircraft) - 7;
+        })
+        .text(function (d) {
+            return d.basedaircraft;
+        });
+
+}
+
+
+
+
+
+
 function updateEmpty() {
 
     d3.select("svg").remove();
@@ -354,8 +435,9 @@ layer_airports.on('featureClicked', function (featureEvent) {
     let airport_selected_rwlength = featureEvent.data.runwaylength;
     let airport_selected_basedjets = featureEvent.data.basedjets;
     let airport_selected_elevation = featureEvent.data.elevation;
+    let airport_selected_basedaircraft = featureEvent.data.based_aircraft_from_5010;
 
-    comp.push({ id: airport_selected_id, rwlength: airport_selected_rwlength, basedjets: airport_selected_basedjets, elevation: airport_selected_elevation});
+    comp.push({ id: airport_selected_id, rwlength: airport_selected_rwlength, basedjets: airport_selected_basedjets, elevation: airport_selected_elevation, basedaircraft: airport_selected_basedaircraft});
 
     if (comp_type === "RWlength") {
         updateRWlength();
@@ -365,6 +447,9 @@ layer_airports.on('featureClicked', function (featureEvent) {
     }
     else if (comp_type === "Elevation"){
         updateElevation();
+    }
+    else if (comp_type === "BasedAircraft"){
+        updateBasedAircraft();
     }
 
 
@@ -388,6 +473,9 @@ function clearbars() {
     }
     else if (comp_type === "Elevation"){
         updateElevation();
+    }
+    else if (comp_type === "BasedAircraft"){
+        updateBasedAircraft();
     }
 }
 

@@ -91,6 +91,8 @@
                     <h2>Numerical Filters</h2>
                     <p>Elevation</p>
                     <div id="elevation-slider"></div>
+                    <p>Total Based Aircraft</p>
+                    <div id="basedaircraft-slider"></div>
                     <p>Based Jets</p>
                     <div id="basedjets-slider"></div>
                     <p>Longest Runway Length</p>
@@ -324,7 +326,7 @@
                 <div class="content" id="content4">
                     <h2>Airport Style</h2>
                     <p>Symbolize By:</p>
-                    <div class="switch-toggle switch-3 switch-candy" style="width: 20em">
+                    <div class="switch-toggle switch-3 switch-candy" style="width: 25em">
                         <input id="StyleNpias" name="style" type="radio" value='npias' checked="checked" />
                         <label for="StyleNpias" onClick="styleNPIAS()">NPIAS</label>
 
@@ -353,7 +355,7 @@
                         <button type="button" onclick="clearbars()" style="color: black; border-radius: 6px; font-family: Roboto, sans-serif;">Clear Selection</button>
 
                     </div>
-                    <div class="switch-toggle switch-3 switch-candy" style="width: 25em">
+                    <div class="switch-toggle switch-3 switch-candy" style="width: 33em">
                         <input id="RWcomp" name="Comp" type="radio" value='RW' checked="checked" />
                         <label for="RWcomp" onclick="updateRWlength();">RW Length</label>
 
@@ -362,6 +364,9 @@
 
                         <input id="BasedJetsComp" name="Comp" type="radio" value='BJ'/>
                         <label for="BasedJetsComp" onclick="updateBasedJets();">Based Jets</label>
+
+                        <input id="BasedAircraftComp" name="Comp" type="radio" value='BA'/>
+                        <label for="BasedAircraftComp" onclick="updateBasedAircraft();">Based Aircraft</label>
 
 
 

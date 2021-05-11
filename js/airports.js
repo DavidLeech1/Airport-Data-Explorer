@@ -24,7 +24,7 @@ const style_airports = new carto.style.CartoCSS(`
 
 
 const layer_airports = new carto.layer.Layer(source_airports, style_airports, {
-    featureClickColumns: ['id','facilityname','npias','elevation','runwaylength','basedjets','deltaclient']
+    featureClickColumns: ['id','facilityname','npias','elevation','runwaylength','basedjets','deltaclient','based_aircraft_from_5010']
 });
 
 
@@ -259,6 +259,7 @@ function statechange(){
 
     console.log(sql_state);
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -294,6 +295,7 @@ function npiaschange(){
         sql_npias = " AND (NPIAS LIKE 'none')";
     }
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -314,12 +316,13 @@ const popup = L.popup({ closeButton: true });
 layer_airports.on(carto.layer.events.FEATURE_OVER, featureEvent => {
     popup.setLatLng(featureEvent.latLng);
     if (!popup.isOpen()) {
-        popup.setContent("<b>" + 'Airport ID: ' + "</b>" + featureEvent.data.id + "<br>" +
+        popup.setContent("<b>" + 'Airport ID: ' + "</b>" + featureEvent.data.id + "<br>" +  //make sure each of these are added above under feature click column
                             "<b>" + 'Facility Name: ' + "</b>" + featureEvent.data.facilityname + "<br>" +
                             "<b>" + 'NPIAS Category: ' + "</b>" + featureEvent.data.npias + "<br>" +
                             "<b>" + 'Delta Client: ' + "</b>" + featureEvent.data.deltaclient + "<br>" +
                             "<b>" + 'Elevation: ' + "</b>" + featureEvent.data.elevation + "' MSL" + "<br>" +
                             "<b>" + 'Runway Length: ' + "</b>" + featureEvent.data.runwaylength + " ft" + "<br>" +
+                            "<b>" + 'Based Aircraft: ' + "</b>" + featureEvent.data.based_aircraft_from_5010 + "<br>" +
                             "<b>" + 'Based Jets: ' + "</b>" + featureEvent.data.basedjets);
         popup.openOn(map);
     }
@@ -334,7 +337,7 @@ layer_airports.on(carto.layer.events.FEATURE_OUT, featureEvent => {
 
 
 
-
+//Based Jets Slider
 var basedjets_tooltipSlider = document.getElementById('basedjets-slider');
 
 noUiSlider.create(basedjets_tooltipSlider, {
@@ -363,6 +366,46 @@ basedjets_tooltipSlider.noUiSlider.on('change', function () {
     slidebasedjetstwo = slidebasedjets[1];
     console.log(slidebasedjetstwo);
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
+        ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
+        ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
+        ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
+        ' AND enplanements_cy2019 >= ' + slideenplanementsone + ' AND enplanements_cy2019 <= ' + slideenplanementstwo + ' ' + sql_ownership  + sql_deltaclient +
+        sql_atct + sql_ils + sql_als + sql_part139 + sql_state + sql_npias
+    );
+});
+
+
+
+//based aircraft slider
+var basedaircraft_tooltipSlider = document.getElementById('basedaircraft-slider');
+
+noUiSlider.create(basedaircraft_tooltipSlider, {
+    start: [0, 900],
+    tooltips: true,
+    connect: [false, true, false],
+    //step: 10,
+    format: wNumb({
+        decimals: 0
+    }),
+    range: {
+        'min': 0,
+        'max': 900
+    },
+
+});
+
+var slidebasedaircraft;
+var slidebasedaircraftone = 0;
+var slidebasedaircrafttwo = 900;
+
+
+basedaircraft_tooltipSlider.noUiSlider.on('change', function () {
+    slidebasedaircraft = basedaircraft_tooltipSlider.noUiSlider.get();
+    slidebasedaircraftone = slidebasedaircraft[0];
+    slidebasedaircrafttwo = slidebasedaircraft[1];
+    source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -402,6 +445,7 @@ elev_tooltipSlider.noUiSlider.on('change', function () {
     console.log(slideelevationone);
     console.log(slideelevationtwo);
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -439,6 +483,7 @@ rwlength_tooltipSlider.noUiSlider.on('change', function () {
     sliderwlengthone = sliderwlength[0];
     sliderwlengthtwo = sliderwlength[1];
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -475,6 +520,7 @@ rwwidth_tooltipSlider.noUiSlider.on('change', function () {
     sliderwwidthone = sliderwwidth[0];
     sliderwwidthtwo = sliderwwidth[1];
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -512,6 +558,7 @@ enplanements_tooltipSlider.noUiSlider.on('change', function () {
     slideenplanementsone = slideenplanements[0];
     slideenplanementstwo = slideenplanements[1];
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -548,6 +595,7 @@ ops_tooltipSlider.noUiSlider.on('change', function () {
     slideopsone = slideops[0];
     slideopstwo = slideops[1];
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -570,6 +618,7 @@ function OwnerPU() {
     sql_ownership = " AND ownership LIKE 'PU'";
 
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -581,6 +630,7 @@ function OwnerPR() {
     sql_ownership = " AND ownership LIKE 'PR'";
 
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -592,6 +642,7 @@ function Ownerna() {
     sql_ownership = '';
 
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -614,6 +665,7 @@ function ClientY() {
     sql_deltaclient = " AND deltaclient = '1'";
 
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -625,6 +677,7 @@ function ClientN() {
     sql_deltaclient = " AND deltaclient = '0'";
 
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -636,6 +689,7 @@ function Clientna() {
     sql_deltaclient = '';
 
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -656,6 +710,7 @@ function ATCTon() {
     sql_atct = " AND atct LIKE 'true'";
 
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -667,6 +722,7 @@ function ATCToff() {
     sql_atct = " AND atct LIKE 'false'";
 
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -678,6 +734,7 @@ function ATCTna() {
     sql_atct = '';
 
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -696,6 +753,7 @@ function ILSon() {
     sql_ils = " AND full_ils LIKE 'true'";
 
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -707,6 +765,7 @@ function ILSoff() {
     sql_ils = " AND full_ils LIKE 'false'";
 
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -718,6 +777,7 @@ function ILSna() {
     sql_ils = '';
 
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -738,6 +798,7 @@ function ALSon() {
     sql_als = " AND als NOT LIKE 'None'";
 
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -749,6 +810,7 @@ function ALSoff() {
     sql_als = " AND als LIKE 'None'";
 
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -760,6 +822,7 @@ function ALSna() {
     sql_als = '';
 
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -779,6 +842,7 @@ function Part139on() {
     sql_part139 = " AND part139 LIKE 'true'";
 
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -790,6 +854,7 @@ function Part139off() {
     sql_part139 = " AND part139 LIKE 'false'";
 
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
@@ -801,6 +866,7 @@ function Part139na() {
     sql_part139 = '';
 
     source_airports.setQuery('SELECT * FROM airportsforcarto WHERE elevation >= ' + slideelevationone + ' AND elevation <= ' + slideelevationtwo +
+        ' AND based_aircraft_from_5010 >= ' + slidebasedaircraftone + ' AND based_aircraft_from_5010 <= ' + slidebasedaircrafttwo +
         ' AND basedjets >= ' + slidebasedjetsone + ' AND basedjets <= ' + slidebasedjetstwo + ' AND runwaylength >= ' + sliderwlengthone +
         ' AND runwaylength <= ' + sliderwlengthtwo + ' AND runwaywidth >= ' + sliderwwidthone + ' AND runwaywidth <= ' + sliderwwidthtwo +
         ' AND total_operations_from_5010 >= ' + slideopsone + ' AND total_operations_from_5010 <= ' + slideopstwo +
